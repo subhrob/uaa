@@ -1,0 +1,587 @@
+director_uuid: 3d629552-84f9-4790-86da-eab26214bb38
+jobs:
+- azs:
+  - z1
+  instances: 1
+  migrated_from:
+  - az: z1
+    name: postgresql_master_z1
+  name: postgresql_master_z1
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: cfdb-postgresql
+    static_ips:
+    - 10.1.111.21
+  persistent_disk_type: disk_500G
+  properties:
+    postgresql:
+      is_master: true
+      leader_address: 10.1.111.29
+  stemcell: default
+  templates:
+  - name: postgresql96
+    release: postgresql
+  - name: ipfailover
+    release: ipfailover
+  - name: broker-agent
+    release: broker-agent-postgresql
+  vm_extensions:
+  - cfdb-postgresql-postgresql
+  vm_type: vm_4cpu_16gb
+- azs:
+  - z1
+  instances: 1
+  migrated_from:
+  - az: z1
+    name: postgresql_slave_z1
+  name: postgresql_slave_z1
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: cfdb-postgresql
+    static_ips:
+    - 10.1.111.29
+  persistent_disk_type: disk_500G
+  properties:
+    postgresql:
+      leader_address: 10.1.111.21
+  stemcell: default
+  templates:
+  - name: postgresql96
+    release: postgresql
+  - name: ipfailover
+    release: ipfailover
+  - name: broker-agent
+    release: broker-agent-postgresql
+  update:
+    canaries: 10
+  vm_extensions:
+  - cfdb-postgresql-postgresql
+  vm_type: vm_4cpu_16gb
+- azs:
+  - z1
+  instances: 1
+  migrated_from:
+  - az: z1
+    name: pgpool1_z1
+  name: pgpool1_z1
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: cfdb-postgresql
+    static_ips:
+    - 10.1.111.24
+  persistent_disk_type: disk_1G
+  properties:
+    watchdog:
+      heartbeat_destination0: 10.1.111.25
+      heartbeat_destination1: 10.1.111.26
+      heartbeat_destination_port0: 9694
+      heartbeat_destination_port1: 9694
+      other_pgpool_hostname0: 10.1.111.25
+      other_pgpool_hostname1: 10.1.111.26
+      other_pgpool_port0: 9999
+      other_pgpool_port1: 9999
+      other_wd_port0: 9000
+      other_wd_port1: 9000
+      wd_heartbeat_port: 9694
+      wd_hostname: 10.1.111.24
+      wd_port: 9000
+  stemcell: default
+  templates:
+  - name: pgpool-II
+    release: pgpool-II
+  - name: ipfailover
+    release: ipfailover
+  - name: broker-agent
+    release: broker-agent-postgresql
+  vm_extensions:
+  - cfdb-postgresql-pgpool
+  vm_type: vm_2cpu_4gb
+- azs:
+  - z1
+  instances: 1
+  migrated_from:
+  - az: z1
+    name: pgpool2_z1
+  name: pgpool2_z1
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: cfdb-postgresql
+    static_ips:
+    - 10.1.111.25
+  persistent_disk_type: disk_1G
+  properties:
+    watchdog:
+      heartbeat_destination0: 10.1.111.24
+      heartbeat_destination1: 10.1.111.26
+      heartbeat_destination_port0: 9694
+      heartbeat_destination_port1: 9694
+      other_pgpool_hostname0: 10.1.111.24
+      other_pgpool_hostname1: 10.1.111.26
+      other_pgpool_port0: 9999
+      other_pgpool_port1: 9999
+      other_wd_port0: 9000
+      other_wd_port1: 9000
+      wd_heartbeat_port: 9694
+      wd_hostname: 10.1.111.25
+      wd_port: 9000
+  stemcell: default
+  templates:
+  - name: pgpool-II
+    release: pgpool-II
+  - name: ipfailover
+    release: ipfailover
+  - name: broker-agent
+    release: broker-agent-postgresql
+  vm_extensions:
+  - cfdb-postgresql-pgpool
+  vm_type: vm_2cpu_4gb
+- azs:
+  - z1
+  instances: 1
+  migrated_from:
+  - az: z1
+    name: pgpool3_z1
+  name: pgpool3_z1
+  networks:
+  - default:
+    - dns
+    - gateway
+    name: cfdb-postgresql
+    static_ips:
+    - 10.1.111.26
+  persistent_disk_type: disk_1G
+  properties:
+    watchdog:
+      heartbeat_destination0: 10.1.111.24
+      heartbeat_destination1: 10.1.111.25
+      heartbeat_destination_port0: 9694
+      heartbeat_destination_port1: 9694
+      other_pgpool_hostname0: 10.1.111.24
+      other_pgpool_hostname1: 10.1.111.25
+      other_pgpool_port0: 9999
+      other_pgpool_port1: 9999
+      other_wd_port0: 9000
+      other_wd_port1: 9000
+      wd_heartbeat_port: 9694
+      wd_hostname: 10.1.111.26
+      wd_port: 9000
+  stemcell: default
+  templates:
+  - name: pgpool-II
+    release: pgpool-II
+  - name: ipfailover
+    release: ipfailover
+  - name: pgpool-watcher
+    release: pgpool-II
+  - name: broker-agent
+    release: broker-agent-postgresql
+  vm_extensions:
+  - cfdb-postgresql-pgpool
+  vm_type: vm_2cpu_4gb
+name: cfdb-postgresql
+properties:
+  agent:
+    manifest:
+      jobs:
+      - azs:
+        - z1
+        instances: 1
+        migrated_from:
+        - az: z1
+          name: postgresql_master_z1
+        name: postgresql_master_z1
+        networks:
+        - default:
+          - dns
+          - gateway
+          name: cfdb-postgresql
+          static_ips:
+          - 10.1.111.21
+        persistent_disk_type: disk_500G
+        properties:
+          postgresql:
+            is_master: true
+            leader_address: 10.1.111.29
+        stemcell: default
+        templates:
+        - name: postgresql96
+          release: postgresql
+        - name: ipfailover
+          release: ipfailover
+        - name: broker-agent
+          release: broker-agent-postgresql
+        vm_extensions:
+        - cfdb-postgresql-postgresql
+        vm_type: vm_4cpu_16gb
+      - azs:
+        - z1
+        instances: 1
+        migrated_from:
+        - az: z1
+          name: postgresql_slave_z1
+        name: postgresql_slave_z1
+        networks:
+        - default:
+          - dns
+          - gateway
+          name: cfdb-postgresql
+          static_ips:
+          - 10.1.111.29
+        persistent_disk_type: disk_500G
+        properties:
+          postgresql:
+            leader_address: 10.1.111.21
+        stemcell: default
+        templates:
+        - name: postgresql96
+          release: postgresql
+        - name: ipfailover
+          release: ipfailover
+        - name: broker-agent
+          release: broker-agent-postgresql
+        update:
+          canaries: 10
+        vm_extensions:
+        - cfdb-postgresql-postgresql
+        vm_type: vm_4cpu_16gb
+      - azs:
+        - z1
+        instances: 1
+        migrated_from:
+        - az: z1
+          name: pgpool1_z1
+        name: pgpool1_z1
+        networks:
+        - default:
+          - dns
+          - gateway
+          name: cfdb-postgresql
+          static_ips:
+          - 10.1.111.24
+        persistent_disk_type: disk_1G
+        properties:
+          watchdog:
+            heartbeat_destination0: 10.1.111.25
+            heartbeat_destination1: 10.1.111.26
+            heartbeat_destination_port0: 9694
+            heartbeat_destination_port1: 9694
+            other_pgpool_hostname0: 10.1.111.25
+            other_pgpool_hostname1: 10.1.111.26
+            other_pgpool_port0: 9999
+            other_pgpool_port1: 9999
+            other_wd_port0: 9000
+            other_wd_port1: 9000
+            wd_heartbeat_port: 9694
+            wd_hostname: 10.1.111.24
+            wd_port: 9000
+        stemcell: default
+        templates:
+        - name: pgpool-II
+          release: pgpool-II
+        - name: ipfailover
+          release: ipfailover
+        - name: broker-agent
+          release: broker-agent-postgresql
+        vm_extensions:
+        - cfdb-postgresql-pgpool
+        vm_type: vm_2cpu_4gb
+      - azs:
+        - z1
+        instances: 1
+        migrated_from:
+        - az: z1
+          name: pgpool2_z1
+        name: pgpool2_z1
+        networks:
+        - default:
+          - dns
+          - gateway
+          name: cfdb-postgresql
+          static_ips:
+          - 10.1.111.25
+        persistent_disk_type: disk_1G
+        properties:
+          watchdog:
+            heartbeat_destination0: 10.1.111.24
+            heartbeat_destination1: 10.1.111.26
+            heartbeat_destination_port0: 9694
+            heartbeat_destination_port1: 9694
+            other_pgpool_hostname0: 10.1.111.24
+            other_pgpool_hostname1: 10.1.111.26
+            other_pgpool_port0: 9999
+            other_pgpool_port1: 9999
+            other_wd_port0: 9000
+            other_wd_port1: 9000
+            wd_heartbeat_port: 9694
+            wd_hostname: 10.1.111.25
+            wd_port: 9000
+        stemcell: default
+        templates:
+        - name: pgpool-II
+          release: pgpool-II
+        - name: ipfailover
+          release: ipfailover
+        - name: broker-agent
+          release: broker-agent-postgresql
+        vm_extensions:
+        - cfdb-postgresql-pgpool
+        vm_type: vm_2cpu_4gb
+      - azs:
+        - z1
+        instances: 1
+        migrated_from:
+        - az: z1
+          name: pgpool3_z1
+        name: pgpool3_z1
+        networks:
+        - default:
+          - dns
+          - gateway
+          name: cfdb-postgresql
+          static_ips:
+          - 10.1.111.26
+        persistent_disk_type: disk_1G
+        properties:
+          watchdog:
+            heartbeat_destination0: 10.1.111.24
+            heartbeat_destination1: 10.1.111.25
+            heartbeat_destination_port0: 9694
+            heartbeat_destination_port1: 9694
+            other_pgpool_hostname0: 10.1.111.24
+            other_pgpool_hostname1: 10.1.111.25
+            other_pgpool_port0: 9999
+            other_pgpool_port1: 9999
+            other_wd_port0: 9000
+            other_wd_port1: 9000
+            wd_heartbeat_port: 9694
+            wd_hostname: 10.1.111.26
+            wd_port: 9000
+        stemcell: default
+        templates:
+        - name: pgpool-II
+          release: pgpool-II
+        - name: ipfailover
+          release: ipfailover
+        - name: pgpool-watcher
+          release: pgpool-II
+        - name: broker-agent
+          release: broker-agent-postgresql
+        vm_extensions:
+        - cfdb-postgresql-pgpool
+        vm_type: vm_2cpu_4gb
+      properties:
+        pgpool:
+          host1: 10.1.111.24
+          host2: 10.1.111.25
+          host3: 10.1.111.26
+          users:
+          - password: secret
+            user: admin
+          - password: secret
+            user: pguser
+        postgresql:
+          admin_user: admin
+          admin_user_password: secret
+          autovacuum: "on"
+          autovacuum_freeze_max_age: 200000000
+          autovacuum_max_workers: 4
+          autovacuum_naptime: 60
+          checkpoint_completion_target: 0.8
+          checkpoint_segments: 32
+          checkpoint_timeout: 15min
+          clientip: 10.1.111.22
+          database_name: template2
+          database_user: pguser
+          database_user_password: secret
+          enable_ltree: true
+          enable_pg_stat_statements: true
+          enable_pgcrypto: false
+          failover_on_update: true
+          is_HA: true
+          log_checkpoints: true
+          log_filename: postgresql-%a-%H.log
+          log_lock_waits: true
+          log_min_error_statement: error
+          log_min_messages: warning
+          log_rotation_age: 1440
+          log_rotation_size: 40
+          log_statement: ddl
+          maintenance_work_mem: 256MB
+          master_eip: 10.1.111.21
+          max_connections: 500
+          max_wal_senders: 3
+          optimized_failover: true
+          query_running_threshold: 3
+          riemann_graphite_port: 2003
+          riemann_host: 10.1.3.6
+          riemann_port: 5555
+          shared_buffers: 2GB
+          shipper_name: cfdb_postgresql
+          slave_eip: 10.1.111.29
+          superuser_reserved_connections: 5
+          track_io_timing: false
+          track_running_query: true
+          version: 96
+          wal_keep_segments: 50
+          work_mem: 4MB
+        service_agent:
+          password: secret
+          port: 2720
+          username: psql
+        syslog:
+          active: true
+        syslog_ingestor:
+          host: 10.1.4.3
+    password: service-fabrik-postgresql-secret
+    provider:
+      auth_url: null
+      client_id: 06d96d6f-b44e-4586-9519-d032f27a297d
+      client_secret: YSsxNrGuDh+AA/0aC4Z3/kKidZR4ll7fr5aPaa81/vQ=
+      container: cf.azure-postgres-dev.sapmulticloud.com-service-fabrik-postgresql
+      name: azure
+      password: "0000000000000000"
+      resource_group: rg-azure-postgres-dev
+      subscription_id: f1b9567b-8560-44ae-a4fc-741ff0d08a58
+      tenant_id: 42f7676c-f455-423c-82f6-dc2d99791af7
+      tenant_name: null
+      user_domain_name: null
+      username: "0000000000000000"
+    username: service-fabrik-postgresql-agent
+  ipfailover:
+    agent:
+      password: secret
+      username: root
+    max_retry_attempts: 7
+    network:
+      gateway: 10.1.0.1
+      name: platform_z1
+      portname: test-neutron
+      securitygroup: nsg-open-azure-postgres-dev
+      virtualnetworkname: vnet-azure-postgres-dev
+  pcp:
+    password: c1oudc0w
+    user: vcap
+  pgpool:
+    host1: 10.1.111.24
+    host2: 10.1.111.25
+    host3: 10.1.111.26
+    users:
+    - password: secret
+      user: admin
+    - password: secret
+      user: pguser
+  pgpool.debug: false
+  pgpool_conf:
+    backend_data_directory0: /var/vcap/store/postgresql
+    backend_data_directory1: /var/vcap/store/postgresql
+    backend_hostname0: 10.1.111.21
+    backend_hostname1: 10.1.111.29
+    backend_port0: 5432
+    backend_port1: 5432
+    health_check_period: 20
+    health_check_timeout: 10
+    shipper_name: pgpool
+    use_watchdog: true
+  postgresql:
+    admin_user: admin
+    admin_user_password: secret
+    autovacuum: "on"
+    autovacuum_freeze_max_age: 200000000
+    autovacuum_max_workers: 4
+    autovacuum_naptime: 60
+    checkpoint_completion_target: 0.8
+    checkpoint_segments: 32
+    checkpoint_timeout: 15min
+    clientip: 10.1.111.22
+    database_name: template2
+    database_user: pguser
+    database_user_password: secret
+    enable_ltree: true
+    enable_pg_stat_statements: true
+    enable_pgcrypto: false
+    failover_on_update: true
+    is_HA: true
+    log_checkpoints: true
+    log_filename: postgresql-%a-%H.log
+    log_lock_waits: true
+    log_min_error_statement: error
+    log_min_messages: warning
+    log_rotation_age: 1440
+    log_rotation_size: 40
+    log_statement: ddl
+    maintenance_work_mem: 256MB
+    master_eip: 10.1.111.21
+    max_connections: 500
+    max_wal_senders: 3
+    optimized_failover: true
+    query_running_threshold: 3
+    riemann_graphite_port: 2003
+    riemann_host: 10.1.3.6
+    riemann_port: 5555
+    shared_buffers: 2GB
+    shipper_name: cfdb_postgresql
+    slave_eip: 10.1.111.29
+    superuser_reserved_connections: 5
+    track_io_timing: false
+    track_running_query: true
+    version: 96
+    wal_keep_segments: 50
+    work_mem: 4MB
+  service_agent:
+    password: secret
+    port: 2720
+    username: psql
+  swift_backup_credentials:
+    password: 5sv7)oc@DHNw!^f&e?LQ573Pk!-R7$
+    username: swift-hcp-staging
+  syslog:
+    active: true
+  syslog_ingestor:
+    host: 10.1.4.3
+  syslog_name:
+    shipper_name: platform_pgpool
+  watchdog:
+    wd_heartbeat_deadtime: 15
+    wd_heartbeat_keepalive: 2
+    wd_interval: 5
+    wd_life_point: 3
+releases:
+- name: postgresql
+  repository-key: github
+  sha1: 4afd7499431bce8f5d5b591cf745e73fdb1335f6
+  url: https://github.infra.hana.ondemand.com:443/cloudfoundry/postgresql-boshrelease/releases/download/v78/postgresql-78.tgz
+  version: "78"
+- name: pgpool-II
+  repository-key: github
+  sha1: 950ca3b8c896308b91421c888ef84118744a3d10
+  url: https://github.infra.hana.ondemand.com:443/cloudfoundry/pgpool-II-boshrelease/releases/download/v16/pgpool-II-16.tgz
+  version: "16"
+- name: ipfailover
+  repository-key: github
+  sha1: 2eaa53d1a86375a80e25fbb2e9025f1f25109811
+  url: https://github.infra.hana.ondemand.com:443/cloudfoundry/postgresql-ha-helper-boshrelease/releases/download/v24/ipfailover-24.tgz
+  version: "24"
+- name: broker-agent-postgresql
+  repository-key: github
+  sha1: b8a82dae22305c2af56db86edf5adba0121a5a3d
+  url: https://github.infra.hana.ondemand.com:443/cloudfoundry/postgresql-agent-boshrelease/releases/download/v41/broker-agent-postgresql-41.tgz
+  version: "41"
+stemcells:
+- alias: default
+  name: bosh-azure-hyperv-ubuntu-trusty-go_agent
+  version: "3468.5"
+update:
+  canaries: 1
+  canary_watch_time: 1000-30000
+  max_in_flight: 50
+  serial: true
+  update_watch_time: 1000-30000
+
